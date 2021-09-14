@@ -27,12 +27,38 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Display": () => (/* binding */ Display)
 /* harmony export */ });
+/* harmony import */ var _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+
+
 class Display {
     constructor() {
         console.log("Create new display");
         this.screen = document.querySelector('canvas');
+        this.screen.width = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLIER;
+        this.screen.height = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLIER;
+        this.context = this.screen.getContext('2d');
+        this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
+        this.context.fillRect(0, 0, this.screen.width, this.screen.height);
     }
 }
+
+/***/ }),
+/* 3 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DISPLAY_WIDTH": () => (/* binding */ DISPLAY_WIDTH),
+/* harmony export */   "DISPLAY_HEIGHT": () => (/* binding */ DISPLAY_HEIGHT),
+/* harmony export */   "DISPLAY_MULTIPLIER": () => (/* binding */ DISPLAY_MULTIPLIER),
+/* harmony export */   "BG_COLOR": () => (/* binding */ BG_COLOR),
+/* harmony export */   "COLOR": () => (/* binding */ COLOR)
+/* harmony export */ });
+const DISPLAY_WIDTH = 64;
+const DISPLAY_HEIGHT = 32;
+const DISPLAY_MULTIPLIER = 10;
+const BG_COLOR = '#000';
+const COLOR = "#3f6";
 
 /***/ })
 /******/ 	]);
