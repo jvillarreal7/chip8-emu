@@ -10,12 +10,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Chip8": () => (/* binding */ Chip8)
 /* harmony export */ });
 /* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
+/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
+
 
 
 class Chip8 {
     constructor() {
         console.log("Create a new chip8");
         this.display = new _Display__WEBPACK_IMPORTED_MODULE_0__.Display();
+        this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_1__.Memory();
     }
 }
 
@@ -94,6 +97,56 @@ const DISPLAY_MULTIPLIER = 10;
 const BG_COLOR = '#000';
 const COLOR = '#3f6';
 
+/***/ }),
+/* 4 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Memory": () => (/* binding */ Memory)
+/* harmony export */ });
+/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+
+
+class Memory {
+    constructor() {
+        this.memory = new Uint8Array(_constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__.MEMORY_SIZE);
+        this.reset();
+    }
+    reset() {
+        this.memory.fill(0);
+    }
+
+    setMemory(index, value) {
+        this.assertMemory(index);
+        this.memory[index] = value;
+    }
+
+    getMemory(index) {
+        this.assertMemory(index);
+        return this.memory[index];
+    }
+
+    assertMemory(index) {
+        console.assert(
+            index >= 0 && index < _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__.MEMORY_SIZE, 
+            `Error trying to access memory at index ${index}`
+        );
+    }
+}
+
+/***/ }),
+/* 5 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "MEMORY_SIZE": () => (/* binding */ MEMORY_SIZE),
+/* harmony export */   "LOAD_PROGRAM_ADDRESS": () => (/* binding */ LOAD_PROGRAM_ADDRESS)
+/* harmony export */ });
+const MEMORY_SIZE = 4095; // 0xFFF
+const LOAD_PROGRAM_ADDRESS = 0x200; // 512
+
 /***/ })
 /******/ 	]);
 /************************************************************************/
@@ -160,6 +213,10 @@ __webpack_require__.r(__webpack_exports__);
 
 const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8();
 
+// Set 26 into memory.
+chip8.memory.setMemory(0x05, 0x1a);
+const result = chip8.memory.getMemory(0x05);
+console.log(result);
 })();
 
 /******/ })()
