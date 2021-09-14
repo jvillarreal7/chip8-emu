@@ -38,7 +38,41 @@ class Display {
         this.screen.height = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLIER;
         this.context = this.screen.getContext('2d');
         this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
+        this.frameBuffer = [];
+        this.reset();
+    }
+    reset() {
+        for(let i = 0; i < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT; i++) {
+            this.frameBuffer.push([]);
+            for(let j = 0; j < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH; j++) {
+                this.frameBuffer[i].push(1);
+            }
+        }
         this.context.fillRect(0, 0, this.screen.width, this.screen.height);
+        this.drawBuffer();
+    }
+    drawBuffer() {
+        for(let h = 0; h < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT; h++) {
+            this.frameBuffer.push([]);
+            for(let w = 0; w < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH; w++) {
+                this.drawPixel(h, w, this.frameBuffer[h][w]);
+            }
+        }
+    }
+    drawPixel(h, w, value) {
+        if(value) {
+            // Pixel is on
+            this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.COLOR;
+        } else {
+            // Pixel is off
+            this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
+        }
+        this.context.fillRect(
+            w * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLIER, 
+            h * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLIER, 
+            _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLIER, 
+            _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLIER
+        );
     }
 }
 
@@ -58,7 +92,7 @@ const DISPLAY_WIDTH = 64;
 const DISPLAY_HEIGHT = 32;
 const DISPLAY_MULTIPLIER = 10;
 const BG_COLOR = '#000';
-const COLOR = "#3f6";
+const COLOR = '#3f6';
 
 /***/ })
 /******/ 	]);

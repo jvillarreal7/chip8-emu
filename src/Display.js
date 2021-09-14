@@ -1,4 +1,4 @@
-import { BG_COLOR, DISPLAY_HEIGHT, DISPLAY_MULTIPLIER, DISPLAY_WIDTH } from "./constants/displayConstants";
+import { BG_COLOR, DISPLAY_HEIGHT, DISPLAY_MULTIPLIER, DISPLAY_WIDTH, COLOR } from "./constants/displayConstants";
 
 export class Display {
     constructor() {
@@ -8,6 +8,40 @@ export class Display {
         this.screen.height = DISPLAY_HEIGHT * DISPLAY_MULTIPLIER;
         this.context = this.screen.getContext('2d');
         this.context.fillStyle = BG_COLOR;
+        this.frameBuffer = [];
+        this.reset();
+    }
+    reset() {
+        for(let i = 0; i < DISPLAY_HEIGHT; i++) {
+            this.frameBuffer.push([]);
+            for(let j = 0; j < DISPLAY_WIDTH; j++) {
+                this.frameBuffer[i].push(1);
+            }
+        }
         this.context.fillRect(0, 0, this.screen.width, this.screen.height);
+        this.drawBuffer();
+    }
+    drawBuffer() {
+        for(let h = 0; h < DISPLAY_HEIGHT; h++) {
+            this.frameBuffer.push([]);
+            for(let w = 0; w < DISPLAY_WIDTH; w++) {
+                this.drawPixel(h, w, this.frameBuffer[h][w]);
+            }
+        }
+    }
+    drawPixel(h, w, value) {
+        if(value) {
+            // Pixel is on
+            this.context.fillStyle = COLOR;
+        } else {
+            // Pixel is off
+            this.context.fillStyle = BG_COLOR;
+        }
+        this.context.fillRect(
+            w * DISPLAY_MULTIPLIER, 
+            h * DISPLAY_MULTIPLIER, 
+            DISPLAY_MULTIPLIER, 
+            DISPLAY_MULTIPLIER
+        );
     }
 }
