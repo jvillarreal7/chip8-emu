@@ -9,10 +9,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Chip8": () => (/* binding */ Chip8)
 /* harmony export */ });
-/* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
-/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
-/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
+/* harmony import */ var _constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
+/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
+/* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
+/* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
+/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6);
+/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
+
+
 
 
 
@@ -21,13 +25,19 @@ __webpack_require__.r(__webpack_exports__);
 class Chip8 {
     constructor() {
         console.log("Create a new chip8");
-        this.display = new _Display__WEBPACK_IMPORTED_MODULE_0__.Display();
-        this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_2__.Memory();
-        this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_3__.Registers();
-        this.keyboard = new _Keyboard__WEBPACK_IMPORTED_MODULE_1__.Keyboard()
+        this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_4__.Memory();
+        this.loadCharSet()
+
+        this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_5__.Registers();
+        this.keyboard = new _Keyboard__WEBPACK_IMPORTED_MODULE_3__.Keyboard();
+        this.display = new _Display__WEBPACK_IMPORTED_MODULE_2__.Display(this.memory);
+
     }
     sleep(ms = 1000) {
         return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+    loadCharSet() {
+        this.memory.memory.set(_constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__.CHAR_SET, _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.CHAR_SET_ADDRESS);
     }
 }
 
@@ -39,34 +49,37 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Display": () => (/* binding */ Display)
 /* harmony export */ });
-/* harmony import */ var _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* harmony import */ var _constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
+/* harmony import */ var _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
+
 
 
 class Display {
-    constructor() {
+    constructor(memory) {
         console.log("Create new display");
+        this.memory = memory;
         this.screen = document.querySelector('canvas');
-        this.screen.width = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLIER;
-        this.screen.height = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLIER;
+        this.screen.width = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_WIDTH * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_MULTIPLIER;
+        this.screen.height = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_HEIGHT * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_MULTIPLIER;
         this.context = this.screen.getContext('2d');
-        this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
+        this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.BG_COLOR;
         this.frameBuffer = [];
         this.reset();
     }
     reset() {
-        for(let i = 0; i < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT; i++) {
+        for(let i = 0; i < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_HEIGHT; i++) {
             this.frameBuffer.push([]);
-            for(let j = 0; j < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH; j++) {
-                this.frameBuffer[i].push(1);
+            for(let j = 0; j < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_WIDTH; j++) {
+                this.frameBuffer[i].push(0);
             }
         }
         this.context.fillRect(0, 0, this.screen.width, this.screen.height);
         this.drawBuffer();
     }
     drawBuffer() {
-        for(let h = 0; h < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT; h++) {
+        for(let h = 0; h < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_HEIGHT; h++) {
             this.frameBuffer.push([]);
-            for(let w = 0; w < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH; w++) {
+            for(let w = 0; w < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_WIDTH; w++) {
                 this.drawPixel(h, w, this.frameBuffer[h][w]);
             }
         }
@@ -74,17 +87,28 @@ class Display {
     drawPixel(h, w, value) {
         if(value) {
             // Pixel is on
-            this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.COLOR;
+            this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.COLOR;
         } else {
             // Pixel is off
-            this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR;
+            this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.BG_COLOR;
         }
         this.context.fillRect(
-            w * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLIER, 
-            h * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLIER, 
-            _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLIER, 
-            _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLIER
+            w * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_MULTIPLIER, 
+            h * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_MULTIPLIER, 
+            _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_MULTIPLIER, 
+            _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_MULTIPLIER
         );
+    }
+    drawSprite(h, w, spriteAddress, num) {
+        for(let lh = 0; lh < num; lh++) {
+            const line = this.memory.memory[spriteAddress+lh];
+            for(let lw = 0; lw < _constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__.CHAR_SET_WIDTH; lw++) {
+                // Dislocate to the right.
+                const bitToCheck = (0b10000000 >> lw);
+                const value = line & bitToCheck;
+                this.drawPixel(h+lh, w+lw, value);
+            }
+        }
     }
 }
 
@@ -112,9 +136,69 @@ const COLOR = '#3f6';
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Keyboard": () => (/* binding */ Keyboard)
+/* harmony export */ });
+/* harmony import */ var _constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+
+
+class Keyboard {
+    constructor() {
+        this.keys = new Array(_constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__.NUMBER_OF_KEYS).fill(false);
+        document.addEventListener("keydown", (event) => this.keydown(event.key));
+        document.addEventListener("keyup", (event) => this.keyup(event.key));
+    }
+    keydown(key) {
+        const keyIndex = _constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__.keyMap.findIndex((mapKey) => mapKey === key.toLowerCase());
+        if(keyIndex > -1) {
+            //console.log("Real key", key, "mapped to chip8", keyIndex);
+            this.keys[keyIndex] = true;
+        }
+    }
+
+    keyup(key) {
+        const keyIndex = _constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__.keyMap.findIndex((mapKey) => mapKey === key.toLowerCase());
+        if(keyIndex > -1) {
+            this.keys[keyIndex] = false;
+        }
+    }
+
+    isKeydown(keyIndex) {
+        return this.keys[keyIndex]
+    }
+
+    hasKeydown() {
+        // "Is any key down?"
+        return this.keys.findIndex((key) => key) != -1;
+    }
+}
+
+/***/ }),
+/* 5 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "NUMBER_OF_KEYS": () => (/* binding */ NUMBER_OF_KEYS),
+/* harmony export */   "keyMap": () => (/* binding */ keyMap)
+/* harmony export */ });
+const NUMBER_OF_KEYS = 16
+const keyMap = [
+    "1", "2", "3", 
+    "q", "w", "e",
+    "a", "s", "d",
+    "x", "z", "c",
+    "4", "r", "f", "v"
+]
+
+/***/ }),
+/* 6 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Memory": () => (/* binding */ Memory)
 /* harmony export */ });
-/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
 
 
 class Memory {
@@ -145,27 +229,29 @@ class Memory {
 }
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "MEMORY_SIZE": () => (/* binding */ MEMORY_SIZE),
-/* harmony export */   "LOAD_PROGRAM_ADDRESS": () => (/* binding */ LOAD_PROGRAM_ADDRESS)
+/* harmony export */   "LOAD_PROGRAM_ADDRESS": () => (/* binding */ LOAD_PROGRAM_ADDRESS),
+/* harmony export */   "CHAR_SET_ADDRESS": () => (/* binding */ CHAR_SET_ADDRESS)
 /* harmony export */ });
 const MEMORY_SIZE = 4095; // 0xFFF
 const LOAD_PROGRAM_ADDRESS = 0x200; // 512
+const CHAR_SET_ADDRESS = 0x000;
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Registers": () => (/* binding */ Registers)
 /* harmony export */ });
-/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
-/* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
+/* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
+/* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
 
 
 
@@ -215,7 +301,7 @@ class Registers {
 }
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -227,65 +313,114 @@ const NUMBER_OF_REGISTERS = 16;
 const STACK_DEPTH = 16;
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Keyboard": () => (/* binding */ Keyboard)
+/* harmony export */   "CHAR_SET_WIDTH": () => (/* binding */ CHAR_SET_WIDTH),
+/* harmony export */   "CHAR_SET": () => (/* binding */ CHAR_SET)
 /* harmony export */ });
-/* harmony import */ var _constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+const CHAR_SET_WIDTH = 8;
 
-
-class Keyboard {
-    constructor() {
-        this.keys = new Array(_constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__.NUMBER_OF_KEYS).fill(false);
-        console.log('c', this.keys);
-        document.addEventListener("keydown", (event) => this.keydown(event.key));
-        document.addEventListener("keyup", (event) => this.keyup(event.key));
-    }
-    keydown(key) {
-        const keyIndex = _constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__.keyMap.findIndex((mapKey) => mapKey === key.toLowerCase());
-        if(keyIndex > -1) {
-            //console.log("Real key", key, "mapped to chip8", keyIndex);
-            this.keys[keyIndex] = true;
-        }
-        console.log('f', this.keys);
-    }
-
-    keyup(key) {
-        const keyIndex = _constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__.keyMap.findIndex((mapKey) => mapKey === key.toLowerCase());
-        if(keyIndex > -1) {
-            this.keys[keyIndex] = false;
-        }
-    }
-
-    isKeydown(keyIndex) {
-        return this.keys[keyIndex]
-    }
-
-    hasKeydown() {
-        // "Is any key down?"
-        return this.keys.findIndex((key) => key) != -1;
-    }
-}
-
-/***/ }),
-/* 9 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "NUMBER_OF_KEYS": () => (/* binding */ NUMBER_OF_KEYS),
-/* harmony export */   "keyMap": () => (/* binding */ keyMap)
-/* harmony export */ });
-const NUMBER_OF_KEYS = 16
-const keyMap = [
-    "1", "2", "3", 
-    "q", "w", "e",
-    "a", "s", "d",
-    "x", "z", "c",
-    "4", "r", "f", "v"
+const CHAR_SET = [
+    // Sprites for:
+    // 0
+    0xF0,
+    0x90,
+    0x90,
+    0x90,
+    0xF0,
+    // 1
+    0x20,
+    0x60,
+    0x20,
+    0x20,
+    0x70,
+    // 2
+    0xF0,
+    0x10,
+    0xF0,
+    0x80,
+    0xF0,
+    // 3
+    0xF0,
+    0x10,
+    0xF0,
+    0x10,
+    0xF0,
+    // 4
+    0x90,
+    0x90,
+    0xF0,
+    0x10,
+    0x10,
+    // 5
+    0xF0,
+    0x80,
+    0xF0,
+    0x10,
+    0xF0,
+    // 6
+    0xF0,
+    0x80,
+    0xF0,
+    0x90,
+    0xF0,
+    // 7
+    0xF0,
+    0x10,
+    0x20,
+    0x40,
+    0x40,
+    // 8
+    0xF0,
+    0x90,
+    0xF0,
+    0x90,
+    0xF0,
+    // 9
+    0xF0,
+    0x90,
+    0xF0,
+    0x10,
+    0xF0,
+    // A
+    0xF0,
+    0x90,
+    0xF0,
+    0x90,
+    0x90,
+    // B
+    0xE0,
+    0x90,
+    0xE0,
+    0x90,
+    0xE0,
+    // C
+    0xF0,
+    0x80,
+    0x80,
+    0x80,
+    0xF0,
+    // D
+    0xE0,
+    0x90,
+    0x90,
+    0x90,
+    0xE0,
+    // E
+    0xF0,
+    0x80,
+    0xF0,
+    0x80,
+    0xF0,
+    // F
+    0xF0,
+    0x80,
+    0xF0,
+    0x80,
+    0x80,
 ]
 
 /***/ })
@@ -355,16 +490,22 @@ __webpack_require__.r(__webpack_exports__);
 const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8();
 
 async function runChip8() {
-    while(1) {
-        const haskeydown = chip8.keyboard.hasKeydown();
-        const iskeydown = chip8.keyboard.isKeydown(1);
-        console.log('haskeydown', haskeydown);
-        console.log('iskeydown', iskeydown);
-        await chip8.sleep();
-    }
+    chip8.display.drawSprite(10,1,0,5);
+    chip8.display.drawSprite(10,6,5,5);
+    chip8.display.drawSprite(10,11,10,5);
+    chip8.display.drawSprite(10,16,15,5);
+
 }
 
 runChip8();
+
+// while(1) {
+    //     const haskeydown = chip8.keyboard.hasKeydown();
+    //     const iskeydown = chip8.keyboard.isKeydown(1);
+    //     console.log('haskeydown', haskeydown);
+    //     console.log('iskeydown', iskeydown);
+    //     await chip8.sleep();
+    // }
 
 // chip8.registers.stackPush(13);
 // chip8.registers.stackPush(15);

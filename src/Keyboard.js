@@ -3,7 +3,6 @@ import { keyMap, NUMBER_OF_KEYS } from "./constants/keyboardConstants";
 export class Keyboard {
     constructor() {
         this.keys = new Array(NUMBER_OF_KEYS).fill(false);
-        console.log('c', this.keys);
         document.addEventListener("keydown", (event) => this.keydown(event.key));
         document.addEventListener("keyup", (event) => this.keyup(event.key));
     }
@@ -13,7 +12,6 @@ export class Keyboard {
             //console.log("Real key", key, "mapped to chip8", keyIndex);
             this.keys[keyIndex] = true;
         }
-        console.log('f', this.keys);
     }
 
     keyup(key) {
