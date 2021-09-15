@@ -12,11 +12,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
 /* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(10);
-/* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
-/* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(6);
-/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
-/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(9);
-/* harmony import */ var _SoundCard__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(11);
+/* harmony import */ var _Disassembler__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);
+/* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(4);
+/* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);
+/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(8);
+/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(9);
+/* harmony import */ var _SoundCard__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(11);
+
 
 
 
@@ -29,13 +31,14 @@ __webpack_require__.r(__webpack_exports__);
 class Chip8 {
     constructor() {
         console.log("Create a new chip8");
-        this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_5__.Memory();
+        this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_6__.Memory();
         this.loadCharSet()
 
-        this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_6__.Registers();
-        this.keyboard = new _Keyboard__WEBPACK_IMPORTED_MODULE_4__.Keyboard();
-        this.soundCard = new _SoundCard__WEBPACK_IMPORTED_MODULE_7__.SoundCard();
-        this.display = new _Display__WEBPACK_IMPORTED_MODULE_3__.Display(this.memory);
+        this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_7__.Registers();
+        this.keyboard = new _Keyboard__WEBPACK_IMPORTED_MODULE_5__.Keyboard();
+        this.soundCard = new _SoundCard__WEBPACK_IMPORTED_MODULE_8__.SoundCard();
+        this.disassembler = new _Disassembler__WEBPACK_IMPORTED_MODULE_3__.Disassembler();
+        this.display = new _Display__WEBPACK_IMPORTED_MODULE_4__.Display(this.memory);
     }
     sleep(ms = _constants_registersConstants__WEBPACK_IMPORTED_MODULE_2__.TIMER_60_HZ) {
         return new Promise((resolve) => setTimeout(resolve, ms));
@@ -496,6 +499,44 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 const INITIAL_VOLUME = 0.3;
 
+/***/ }),
+/* 13 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Disassembler": () => (/* binding */ Disassembler)
+/* harmony export */ });
+/* harmony import */ var _constants_instructionSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(14);
+
+
+class Disassembler {
+    disassemble(opcode) {
+        const instruction = _constants_instructionSet__WEBPACK_IMPORTED_MODULE_0__.INSTRUCTION_SET.find(
+            instruction => (opcode & instruction.mask) === instruction.pattern
+        );
+        console.log('instruction', instruction);
+    }
+}
+
+/***/ }),
+/* 14 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "INSTRUCTION_SET": () => (/* binding */ INSTRUCTION_SET)
+/* harmony export */ });
+const INSTRUCTION_SET = [
+    {
+        key: 1,
+        id: 'CLS',
+        name: 'CLS',
+        mask: 0xFFFF,
+        pattern: 0x00E0
+    }
+]
+
 /***/ })
 /******/ 	]);
 /************************************************************************/
@@ -563,23 +604,23 @@ __webpack_require__.r(__webpack_exports__);
 const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8();
 
 async function runChip8() {
-    chip8.registers.ST = 10;
-    while(1) {
-        await chip8.sleep(200);
-        if(chip8.registers.DT > 0) {
-            await chip8.sleep();
-            chip8.registers.DT--;
-        }
-        if(chip8.registers.ST > 0) {
-            chip8.soundCard.enableSound();
-            await chip8.sleep();
-            chip8.registers.ST--;
-        }
-        if(chip8.registers.ST === 0) {
-            chip8.soundCard.disableSound();
-        }
-    }
-    chip8.soundCard.enableSound();
+    chip8.disassembler.disassemble(0x00E0);
+    // chip8.registers.ST = 10;
+    // while(1) {
+    //     await chip8.sleep(200);
+    //     if(chip8.registers.DT > 0) {
+    //         await chip8.sleep();
+    //         chip8.registers.DT--;
+    //     }
+    //     if(chip8.registers.ST > 0) {
+    //         chip8.soundCard.enableSound();
+    //         await chip8.sleep();
+    //         chip8.registers.ST--;
+    //     }
+    //     if(chip8.registers.ST === 0) {
+    //         chip8.soundCard.disableSound();
+    //     }
+    // }
 }
 
 runChip8();
