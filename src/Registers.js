@@ -5,8 +5,10 @@ export class Registers {
     constructor() {
         this.V = new Uint8Array(NUMBER_OF_REGISTERS);
         this.I = 0;
-        this.delayTimer = 0;
-        this.soundTimer = 0;
+        // Delay timer
+        this.DT = 0;
+        // Sound timer
+        this.ST = 0;
         // Program counter
         this.PC = LOAD_PROGRAM_ADDRESS;
         // Stack pointer
