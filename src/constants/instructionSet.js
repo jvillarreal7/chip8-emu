@@ -41,7 +41,7 @@ export const INSTRUCTION_SET = [
     },
     {
         key: 6,
-        id: 'SE_VX_NN',
+        id: 'SE_VX_KK',
         name: 'SE',
         mask: MASK_HIGHEST_BYTE,
         pattern: 0x3000,
@@ -49,7 +49,7 @@ export const INSTRUCTION_SET = [
     },
     {
         key: 7,
-        id: 'SNE_VX_NN',
+        id: 'SNE_VX_KK',
         name: 'SNE',
         mask: MASK_HIGHEST_BYTE,
         pattern: 0x4000,

@@ -1,17 +1,12 @@
 import { Chip8 } from "./Chip8";
 
-const chip8 = new Chip8();
-
 async function runChip8() {
-    chip8.disassembler.disassemble(0xF107);
-    chip8.disassembler.disassemble(0xF10A);
-    chip8.disassembler.disassemble(0xF115);
-    chip8.disassembler.disassemble(0xF118);
-    chip8.disassembler.disassemble(0xF11E);
-    chip8.disassembler.disassemble(0xF129);
-    chip8.disassembler.disassemble(0xF133);
-    chip8.disassembler.disassemble(0xF155);
-    chip8.disassembler.disassemble(0xF165);
+    const rom = await fetch('./roms/test_opcode');
+    const arrayBuffer = await rom.arrayBuffer();
+    const romBuffer = new Uint8Array(arrayBuffer);
+    const chip8 = new Chip8(romBuffer);
+    chip8.execute(0x00e0);
+
 
     // chip8.registers.ST = 10;
     // while(1) {

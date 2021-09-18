@@ -1,5 +1,5 @@
 import { CHAR_SET } from "./constants/charSetConstants";
-import { CHAR_SET_ADDRESS } from "./constants/memoryConstants";
+import { CHAR_SET_ADDRESS, LOAD_PROGRAM_ADDRESS, MEMORY_SIZE } from "./constants/memoryConstants";
 import { TIMER_60_HZ } from "./constants/registersConstants";
 import { Disassembler } from "./Disassembler";
 import { Display } from "./Display";
@@ -9,12 +9,12 @@ import { Registers } from "./Registers";
 import { SoundCard } from "./SoundCard";
 
 export class Chip8 {
-    constructor() {
+    constructor(romBuffer) {
         console.log("Create a new chip8");
         this.memory = new Memory();
-        this.loadCharSet()
-
         this.registers = new Registers();
+        this.loadCharSet()
+        this.loadRom(romBuffer);
         this.keyboard = new Keyboard();
         this.soundCard = new SoundCard();
         this.disassembler = new Disassembler();
@@ -25,5 +25,27 @@ export class Chip8 {
     }
     loadCharSet() {
         this.memory.memory.set(CHAR_SET, CHAR_SET_ADDRESS);
+    }
+    loadRom(romBuffer) {
+        console.assert(
+            romBuffer.length + LOAD_PROGRAM_ADDRESS <= MEMORY_SIZE, 
+            'This ROM is too large.');
+        this.memory.memory.set(romBuffer, LOAD_PROGRAM_ADDRESS);
+        this.registers.PC = LOAD_PROGRAM_ADDRESS;
+    }
+    execute(opcode) {
+        const {instruction, args} = this.disassembler.disassemble(opcode);
+        const {id} = instruction;
+        console.log('i', instruction);
+        console.log('a', args);
+        console.log('id', id);
+
+        switch(id) {
+            case 'CLS':
+                this.display.reset();
+                break;
+            default:
+                console.error(`Instruction with id ${id} not found.`, instruction, args);
+        }
     }
 }

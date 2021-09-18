@@ -22,6 +22,7 @@ export class Display {
         }
         this.context.fillRect(0, 0, this.screen.width, this.screen.height);
         this.drawBuffer();
+        console.log("Reset display")
     }
     drawBuffer() {
         for(let h = 0; h < DISPLAY_HEIGHT; h++) {

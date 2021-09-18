@@ -8,21 +8,23 @@ export class Memory {
     reset() {
         this.memory.fill(0);
     }
-
     setMemory(index, value) {
         this.assertMemory(index);
         this.memory[index] = value;
     }
-
     getMemory(index) {
         this.assertMemory(index);
         return this.memory[index];
     }
-
     assertMemory(index) {
         console.assert(
             index >= 0 && index < MEMORY_SIZE, 
             `Error trying to access memory at index ${index}`
         );
+    }
+    getOpcode(index) {
+        const highByte = this.getMemory(index);
+        const lowByte = this.getMemory(index + 1);
+        return (highByte << 8) | lowByte;
     }
 }

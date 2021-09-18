@@ -29,12 +29,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Chip8 {
-    constructor() {
+    constructor(romBuffer) {
         console.log("Create a new chip8");
         this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_6__.Memory();
-        this.loadCharSet()
-
         this.registers = new _Registers__WEBPACK_IMPORTED_MODULE_7__.Registers();
+        this.loadCharSet()
+        this.loadRom(romBuffer);
         this.keyboard = new _Keyboard__WEBPACK_IMPORTED_MODULE_5__.Keyboard();
         this.soundCard = new _SoundCard__WEBPACK_IMPORTED_MODULE_8__.SoundCard();
         this.disassembler = new _Disassembler__WEBPACK_IMPORTED_MODULE_3__.Disassembler();
@@ -45,6 +45,28 @@ class Chip8 {
     }
     loadCharSet() {
         this.memory.memory.set(_constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__.CHAR_SET, _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.CHAR_SET_ADDRESS);
+    }
+    loadRom(romBuffer) {
+        console.assert(
+            romBuffer.length + _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.LOAD_PROGRAM_ADDRESS <= _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.MEMORY_SIZE, 
+            'This ROM is too large.');
+        this.memory.memory.set(romBuffer, _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.LOAD_PROGRAM_ADDRESS);
+        this.registers.PC = _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.LOAD_PROGRAM_ADDRESS;
+    }
+    execute(opcode) {
+        const {instruction, args} = this.disassembler.disassemble(opcode);
+        const {id} = instruction;
+        console.log('i', instruction);
+        console.log('a', args);
+        console.log('id', id);
+
+        switch(id) {
+            case 'CLS':
+                this.display.reset();
+                break;
+            default:
+                console.error(`Instruction with id ${id} not found.`, instruction, args);
+        }
     }
 }
 
@@ -201,13 +223,12 @@ __webpack_require__.r(__webpack_exports__);
 class Disassembler {
     disassemble(opcode) {
         const instruction = _constants_instructionSet__WEBPACK_IMPORTED_MODULE_0__.INSTRUCTION_SET.find(
-            instruction => (opcode & instruction.mask) === instruction.pattern
+            (instruction) => (opcode & instruction.mask) === instruction.pattern
         );
         const args = instruction.arguments.map(
-            arg => (opcode & arg.mask) >> arg.shift
+            (arg) => (opcode & arg.mask) >> arg.shift
         );
-        console.log('instruction', instruction);
-        console.log('args', args);
+        return {instruction, args};
     }
 }
 
@@ -269,7 +290,7 @@ const INSTRUCTION_SET = [
     },
     {
         key: 6,
-        id: 'SE_VX_NN',
+        id: 'SE_VX_KK',
         name: 'SE',
         mask: MASK_HIGHEST_BYTE,
         pattern: 0x3000,
@@ -277,7 +298,7 @@ const INSTRUCTION_SET = [
     },
     {
         key: 7,
-        id: 'SNE_VX_NN',
+        id: 'SNE_VX_KK',
         name: 'SNE',
         mask: MASK_HIGHEST_BYTE,
         pattern: 0x4000,
@@ -543,6 +564,7 @@ class Display {
         }
         this.context.fillRect(0, 0, this.screen.width, this.screen.height);
         this.drawBuffer();
+        console.log("Reset display")
     }
     drawBuffer() {
         for(let h = 0; h < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_HEIGHT; h++) {
@@ -677,22 +699,24 @@ class Memory {
     reset() {
         this.memory.fill(0);
     }
-
     setMemory(index, value) {
         this.assertMemory(index);
         this.memory[index] = value;
     }
-
     getMemory(index) {
         this.assertMemory(index);
         return this.memory[index];
     }
-
     assertMemory(index) {
         console.assert(
             index >= 0 && index < _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__.MEMORY_SIZE, 
             `Error trying to access memory at index ${index}`
         );
+    }
+    getOpcode(index) {
+        const highByte = this.getMemory(index);
+        const lowByte = this.getMemory(index + 1);
+        return (highByte << 8) | lowByte;
     }
 }
 
@@ -885,18 +909,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Chip8__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 
 
-const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8();
-
 async function runChip8() {
-    chip8.disassembler.disassemble(0xF107);
-    chip8.disassembler.disassemble(0xF10A);
-    chip8.disassembler.disassemble(0xF115);
-    chip8.disassembler.disassemble(0xF118);
-    chip8.disassembler.disassemble(0xF11E);
-    chip8.disassembler.disassemble(0xF129);
-    chip8.disassembler.disassemble(0xF133);
-    chip8.disassembler.disassemble(0xF155);
-    chip8.disassembler.disassemble(0xF165);
+    const rom = await fetch('./roms/test_opcode');
+    const arrayBuffer = await rom.arrayBuffer();
+    const romBuffer = new Uint8Array(arrayBuffer);
+    const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8(romBuffer);
+    chip8.execute(0x00e0);
+
 
     // chip8.registers.ST = 10;
     // while(1) {
