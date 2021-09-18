@@ -5,6 +5,10 @@ export class Disassembler {
         const instruction = INSTRUCTION_SET.find(
             instruction => (opcode & instruction.mask) === instruction.pattern
         );
+        const args = instruction.arguments.map(
+            arg => (opcode & arg.mask) >> arg.shift
+        );
         console.log('instruction', instruction);
+        console.log('args', args);
     }
 }

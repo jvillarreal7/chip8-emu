@@ -11,13 +11,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 /* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
-/* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(10);
-/* harmony import */ var _Disassembler__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);
-/* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(4);
-/* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(6);
-/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(8);
-/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(9);
-/* harmony import */ var _SoundCard__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(11);
+/* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+/* harmony import */ var _Disassembler__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
+/* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
+/* harmony import */ var _Keyboard__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9);
+/* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(11);
+/* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(12);
+/* harmony import */ var _SoundCard__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(13);
 
 
 
@@ -179,10 +179,346 @@ const CHAR_SET_ADDRESS = 0x000;
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "NUMBER_OF_REGISTERS": () => (/* binding */ NUMBER_OF_REGISTERS),
+/* harmony export */   "STACK_DEPTH": () => (/* binding */ STACK_DEPTH),
+/* harmony export */   "TIMER_60_HZ": () => (/* binding */ TIMER_60_HZ)
+/* harmony export */ });
+const NUMBER_OF_REGISTERS = 16;
+const STACK_DEPTH = 16;
+const TIMER_60_HZ = 1000/60;
+
+/***/ }),
+/* 5 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Disassembler": () => (/* binding */ Disassembler)
+/* harmony export */ });
+/* harmony import */ var _constants_instructionSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
+
+
+class Disassembler {
+    disassemble(opcode) {
+        const instruction = _constants_instructionSet__WEBPACK_IMPORTED_MODULE_0__.INSTRUCTION_SET.find(
+            instruction => (opcode & instruction.mask) === instruction.pattern
+        );
+        const args = instruction.arguments.map(
+            arg => (opcode & arg.mask) >> arg.shift
+        );
+        console.log('instruction', instruction);
+        console.log('args', args);
+    }
+}
+
+/***/ }),
+/* 6 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "MASK_NNN": () => (/* binding */ MASK_NNN),
+/* harmony export */   "MASK_N": () => (/* binding */ MASK_N),
+/* harmony export */   "MASK_X": () => (/* binding */ MASK_X),
+/* harmony export */   "MASK_Y": () => (/* binding */ MASK_Y),
+/* harmony export */   "MASK_KK": () => (/* binding */ MASK_KK),
+/* harmony export */   "MASK_HIGHEST_BYTE": () => (/* binding */ MASK_HIGHEST_BYTE),
+/* harmony export */   "MASK_HIGHEST_AND_LOWEST_BYTE": () => (/* binding */ MASK_HIGHEST_AND_LOWEST_BYTE),
+/* harmony export */   "INSTRUCTION_SET": () => (/* binding */ INSTRUCTION_SET)
+/* harmony export */ });
+const MASK_NNN = {mask: 0x0FFF};
+const MASK_N = {mask: 0x000F};
+const MASK_X = {mask: 0x0F00, shift: 8};
+const MASK_Y = {mask: 0x00F0, shift: 4};
+const MASK_KK = {mask: 0x00FF};
+const MASK_HIGHEST_BYTE = 0xF000;
+const MASK_HIGHEST_AND_LOWEST_BYTE = 0xF00F;
+
+const INSTRUCTION_SET = [
+    {
+        key: 2,
+        id: 'CLS',
+        name: 'CLS',
+        mask: 0xFFFF,
+        pattern: 0x00E0,
+        arguments: []
+    },
+    {
+        key: 3,
+        id: 'RET',
+        name: 'RET',
+        mask: 0xFFFF,
+        pattern: 0x00EE,
+        arguments: []
+    },
+    {
+        key: 4,
+        id: 'JP_ADDR',
+        name: 'JP',
+        mask: MASK_HIGHEST_BYTE,
+        pattern: 0x1000,
+        arguments: [MASK_NNN]
+    },
+    {
+        key: 5,
+        id: 'CALL_ADDR',
+        name: 'CALL',
+        mask: MASK_HIGHEST_BYTE,
+        pattern: 0x2000,
+        arguments: [MASK_NNN]
+    },
+    {
+        key: 6,
+        id: 'SE_VX_NN',
+        name: 'SE',
+        mask: MASK_HIGHEST_BYTE,
+        pattern: 0x3000,
+        arguments: [MASK_X, MASK_KK]
+    },
+    {
+        key: 7,
+        id: 'SNE_VX_NN',
+        name: 'SNE',
+        mask: MASK_HIGHEST_BYTE,
+        pattern: 0x4000,
+        arguments: [MASK_X, MASK_KK]
+    },
+    {
+        key: 8,
+        id: 'SNE_VX_VY',
+        name: 'SE',
+        mask: MASK_HIGHEST_AND_LOWEST_BYTE,
+        pattern: 0x5000,
+        arguments: [MASK_X, MASK_Y]
+    },
+    {
+        key: 9,
+        id: 'LD_VX_KK',
+        name: 'LD',
+        mask: MASK_HIGHEST_BYTE,
+        pattern: 0x6000,
+        arguments: [MASK_X, MASK_KK]
+    },
+    {
+        key: 10,
+        id: 'ADD_VX_KK',
+        name: 'ADD',
+        mask: MASK_HIGHEST_BYTE,
+        pattern: 0x7000,
+        arguments: [MASK_X, MASK_KK]
+    },
+    {
+        key: 11,
+        id: 'LD_VX_VY',
+        name: 'LD',
+        mask: MASK_HIGHEST_AND_LOWEST_BYTE,
+        pattern: 0x8000,
+        arguments: [MASK_X, MASK_Y]
+    },
+    {
+        key: 12,
+        id: 'OR_VX_VY',
+        name: 'OR',
+        mask: MASK_HIGHEST_AND_LOWEST_BYTE,
+        pattern: 0x8001,
+        arguments: [MASK_X, MASK_Y]
+    },
+    {
+        key: 13,
+        id: 'AND_VX_VY',
+        name: 'AND',
+        mask: MASK_HIGHEST_AND_LOWEST_BYTE,
+        pattern: 0x8002,
+        arguments: [MASK_X, MASK_Y]
+    },
+    {
+        key: 14,
+        id: 'XOR_VX_VY',
+        name: 'XOR',
+        mask: MASK_HIGHEST_AND_LOWEST_BYTE,
+        pattern: 0x8003,
+        arguments: [MASK_X, MASK_Y]
+    },
+    {
+        key: 15,
+        id: 'ADD_VX_VY',
+        name: 'ADD',
+        mask: MASK_HIGHEST_AND_LOWEST_BYTE,
+        pattern: 0x8004,
+        arguments: [MASK_X, MASK_Y]
+    },
+    {
+        key: 16,
+        id: 'SUB_VX_VY',
+        name: 'SUB',
+        mask: MASK_HIGHEST_AND_LOWEST_BYTE,
+        pattern: 0x8005,
+        arguments: [MASK_X, MASK_Y]
+    },
+    {
+        key: 17,
+        id: 'SHR_VX_VY',
+        name: 'SHR',
+        mask: MASK_HIGHEST_AND_LOWEST_BYTE,
+        pattern: 0x8006,
+        arguments: [MASK_X, MASK_Y]
+    },
+    {
+        key: 18,
+        id: 'SUBN_VX_VY',
+        name: 'SUBN',
+        mask: MASK_HIGHEST_AND_LOWEST_BYTE,
+        pattern: 0x8007,
+        arguments: [MASK_X, MASK_Y]
+    },
+    {
+        key: 19,
+        id: 'SHL_VX_VY',
+        name: 'SHL',
+        mask: MASK_HIGHEST_AND_LOWEST_BYTE,
+        pattern: 0x800E,
+        arguments: [MASK_X, MASK_Y]
+    },
+    {
+        key: 20,
+        id: 'SNE_VX_VY',
+        name: 'SNE',
+        mask: MASK_HIGHEST_AND_LOWEST_BYTE,
+        pattern: 0x9000,
+        arguments: [MASK_X, MASK_Y]
+    },
+    {
+        key: 21,
+        id: 'LD_I_ADDR',
+        name: 'LD',
+        mask: MASK_HIGHEST_BYTE,
+        pattern: 0xA000,
+        arguments: [MASK_NNN]
+    },
+    {
+        key: 22,
+        id: 'JP_V0_ADDR',
+        name: 'JP',
+        mask: MASK_HIGHEST_AND_LOWEST_BYTE,
+        pattern: 0xB000,
+        arguments: [MASK_NNN]
+    },
+    {
+        key: 23,
+        id: 'RND_VX',
+        name: 'RND',
+        mask: MASK_HIGHEST_BYTE,
+        pattern: 0xC000,
+        arguments: [MASK_X, MASK_KK]
+    },
+    {
+        key: 24,
+        id: 'DRW_VX_VY_N',
+        name: 'DRW',
+        mask: MASK_HIGHEST_BYTE,
+        pattern: 0xD000,
+        arguments: [MASK_X, MASK_Y, MASK_N]
+    },
+    {
+        key: 25,
+        id: 'SKP_VX',
+        name: 'SKP',
+        mask: 0xF0FF,
+        pattern: 0xE09E,
+        arguments: [MASK_X]
+    },
+    {
+        key: 26,
+        id: 'SKNP_VX',
+        name: 'SKNP',
+        mask: 0xF0FF,
+        pattern: 0xE0A1,
+        arguments: [MASK_X]
+    },
+    {
+        key: 27,
+        id: 'LD_VX_DT',
+        name: 'LD',
+        mask: 0xF0FF,
+        pattern: 0xF007,
+        arguments: [MASK_X]
+    },
+    {
+        key: 28,
+        id: 'LD_VX_K',
+        name: 'LD',
+        mask: 0xF0FF,
+        pattern: 0xF00A,
+        arguments: [MASK_X]
+    },
+    {
+        key: 29,
+        id: 'LD_DT_VX',
+        name: 'LD',
+        mask: 0xF0FF,
+        pattern: 0xF015,
+        arguments: [MASK_X]
+    },
+    {
+        key: 30,
+        id: 'LD_ST_VX',
+        name: 'LD',
+        mask: 0xF0FF,
+        pattern: 0xF018,
+        arguments: [MASK_X]
+    },
+    {
+        key: 31,
+        id: 'ADD_I_VX',
+        name: 'ADD',
+        mask: 0xF0FF,
+        pattern: 0xF01E,
+        arguments: [MASK_X]
+    },
+    {
+        key: 32,
+        id: 'LD_F_VX',
+        name: 'LD',
+        mask: 0xF0FF,
+        pattern: 0xF029,
+        arguments: [MASK_X]
+    },
+    {
+        key: 33,
+        id: 'LD_B_VX',
+        name: 'LD',
+        mask: 0xF0FF,
+        pattern: 0xF033,
+        arguments: [MASK_X]
+    },
+    {
+        key: 34,
+        id: 'LD_I_VX',
+        name: 'LD',
+        mask: 0xF0FF,
+        pattern: 0xF055,
+        arguments: [MASK_X]
+    },
+    {
+        key: 35,
+        id: 'LD_VX_I',
+        name: 'LD',
+        mask: 0xF0FF,
+        pattern: 0xF065,
+        arguments: [MASK_X]
+    }
+]
+
+/***/ }),
+/* 7 */
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Display": () => (/* binding */ Display)
 /* harmony export */ });
 /* harmony import */ var _constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
+/* harmony import */ var _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
 
 
 
@@ -245,7 +581,7 @@ class Display {
 }
 
 /***/ }),
-/* 5 */
+/* 8 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -263,14 +599,14 @@ const BG_COLOR = '#000';
 const COLOR = '#3f6';
 
 /***/ }),
-/* 6 */
+/* 9 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Keyboard": () => (/* binding */ Keyboard)
 /* harmony export */ });
-/* harmony import */ var _constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
+/* harmony import */ var _constants_keyboardConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(10);
 
 
 class Keyboard {
@@ -305,7 +641,7 @@ class Keyboard {
 }
 
 /***/ }),
-/* 7 */
+/* 10 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -323,7 +659,7 @@ const keyMap = [
 ]
 
 /***/ }),
-/* 8 */
+/* 11 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -361,7 +697,7 @@ class Memory {
 }
 
 /***/ }),
-/* 9 */
+/* 12 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -369,7 +705,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Registers": () => (/* binding */ Registers)
 /* harmony export */ });
 /* harmony import */ var _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
-/* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);
+/* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 
 
 
@@ -421,28 +757,14 @@ class Registers {
 }
 
 /***/ }),
-/* 10 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "NUMBER_OF_REGISTERS": () => (/* binding */ NUMBER_OF_REGISTERS),
-/* harmony export */   "STACK_DEPTH": () => (/* binding */ STACK_DEPTH),
-/* harmony export */   "TIMER_60_HZ": () => (/* binding */ TIMER_60_HZ)
-/* harmony export */ });
-const NUMBER_OF_REGISTERS = 16;
-const STACK_DEPTH = 16;
-const TIMER_60_HZ = 1000/60;
-
-/***/ }),
-/* 11 */
+/* 13 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "SoundCard": () => (/* binding */ SoundCard)
 /* harmony export */ });
-/* harmony import */ var _constants_soundCardConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(12);
+/* harmony import */ var _constants_soundCardConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(14);
 
 
 class SoundCard {
@@ -490,7 +812,7 @@ class SoundCard {
 }
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -498,44 +820,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "INITIAL_VOLUME": () => (/* binding */ INITIAL_VOLUME)
 /* harmony export */ });
 const INITIAL_VOLUME = 0.3;
-
-/***/ }),
-/* 13 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Disassembler": () => (/* binding */ Disassembler)
-/* harmony export */ });
-/* harmony import */ var _constants_instructionSet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(14);
-
-
-class Disassembler {
-    disassemble(opcode) {
-        const instruction = _constants_instructionSet__WEBPACK_IMPORTED_MODULE_0__.INSTRUCTION_SET.find(
-            instruction => (opcode & instruction.mask) === instruction.pattern
-        );
-        console.log('instruction', instruction);
-    }
-}
-
-/***/ }),
-/* 14 */
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "INSTRUCTION_SET": () => (/* binding */ INSTRUCTION_SET)
-/* harmony export */ });
-const INSTRUCTION_SET = [
-    {
-        key: 1,
-        id: 'CLS',
-        name: 'CLS',
-        mask: 0xFFFF,
-        pattern: 0x00E0
-    }
-]
 
 /***/ })
 /******/ 	]);
@@ -604,7 +888,16 @@ __webpack_require__.r(__webpack_exports__);
 const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8();
 
 async function runChip8() {
-    chip8.disassembler.disassemble(0x00E0);
+    chip8.disassembler.disassemble(0xF107);
+    chip8.disassembler.disassemble(0xF10A);
+    chip8.disassembler.disassemble(0xF115);
+    chip8.disassembler.disassemble(0xF118);
+    chip8.disassembler.disassemble(0xF11E);
+    chip8.disassembler.disassemble(0xF129);
+    chip8.disassembler.disassemble(0xF133);
+    chip8.disassembler.disassemble(0xF155);
+    chip8.disassembler.disassemble(0xF165);
+
     // chip8.registers.ST = 10;
     // while(1) {
     //     await chip8.sleep(200);

@@ -3,7 +3,16 @@ import { Chip8 } from "./Chip8";
 const chip8 = new Chip8();
 
 async function runChip8() {
-    chip8.disassembler.disassemble(0x00E0);
+    chip8.disassembler.disassemble(0xF107);
+    chip8.disassembler.disassemble(0xF10A);
+    chip8.disassembler.disassemble(0xF115);
+    chip8.disassembler.disassemble(0xF118);
+    chip8.disassembler.disassemble(0xF11E);
+    chip8.disassembler.disassemble(0xF129);
+    chip8.disassembler.disassemble(0xF133);
+    chip8.disassembler.disassemble(0xF155);
+    chip8.disassembler.disassemble(0xF165);
+
     // chip8.registers.ST = 10;
     // while(1) {
     //     await chip8.sleep(200);
