@@ -25,24 +25,20 @@ export class Registers {
         this.SP = -1;
         this.stack.fill(0);
     }
-
     stackPush(value) {
         this.SP++;
         this.assertStackOverflow();
         this.stack[this.SP] = value
     }
-
     stackPop() {
         const value = this.stack[this.SP];
         this.SP--;
         this.assertStackUnderflow();
         return value;
     }
-
     assertStackUnderflow() {
         console.assert(this.SP >= -1, 'Error: Stack underflow');
     }
-
     assertStackOverflow() {
         console.assert(this.SP < STACK_DEPTH, 'Error: Stack overflow');
     }

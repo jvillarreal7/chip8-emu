@@ -64,6 +64,31 @@ class Chip8 {
             case 'CLS':
                 this.display.reset();
                 break;
+            case 'RET':
+                this.registers.PC = this.registers.stackPop();
+                break;
+            case 'JP_ADDR':
+                this.registers.PC = args[0];
+                break;
+            case 'CALL_ADDR':
+                this.registers.stackPush(this.registers.PC);
+                this.registers.PC = args[0];
+                break;
+            case 'SE_VX_KK':
+                if(this.registers.V[args[0]] === args[1]) {
+                    this.registers.PC += 2;
+                }
+                break;
+            case 'SNE_VX_KK':
+                if(this.registers.V[args[0]] !== args[1]) {
+                    this.registers.PC += 2;
+                }
+                break;
+            case 'SE_VX_VY':
+                if(this.registers.V[args[0]] === this.registers.V[args[1]]) {
+                    this.registers.PC += 2;
+                }
+                break;
             default:
                 console.error(`Instruction with id ${id} not found.`, instruction, args);
         }
@@ -306,7 +331,7 @@ const INSTRUCTION_SET = [
     },
     {
         key: 8,
-        id: 'SNE_VX_VY',
+        id: 'SE_VX_VY',
         name: 'SE',
         mask: MASK_HIGHEST_AND_LOWEST_BYTE,
         pattern: 0x5000,
@@ -757,24 +782,20 @@ class Registers {
         this.SP = -1;
         this.stack.fill(0);
     }
-
     stackPush(value) {
         this.SP++;
         this.assertStackOverflow();
         this.stack[this.SP] = value
     }
-
     stackPop() {
         const value = this.stack[this.SP];
         this.SP--;
         this.assertStackUnderflow();
         return value;
     }
-
     assertStackUnderflow() {
         console.assert(this.SP >= -1, 'Error: Stack underflow');
     }
-
     assertStackOverflow() {
         console.assert(this.SP < _constants_registersConstants__WEBPACK_IMPORTED_MODULE_1__.STACK_DEPTH, 'Error: Stack overflow');
     }
@@ -914,7 +935,12 @@ async function runChip8() {
     const arrayBuffer = await rom.arrayBuffer();
     const romBuffer = new Uint8Array(arrayBuffer);
     const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8(romBuffer);
-    chip8.execute(0x00e0);
+    chip8.registers.PC = 0x006;
+    chip8.registers.V[5] = 0x01;
+    chip8.registers.V[8] = 0x02;
+    chip8.execute(0x5580);
+    console.log('pc', chip8.registers.PC);
+    
 
 
     // chip8.registers.ST = 10;

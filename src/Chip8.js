@@ -44,6 +44,31 @@ export class Chip8 {
             case 'CLS':
                 this.display.reset();
                 break;
+            case 'RET':
+                this.registers.PC = this.registers.stackPop();
+                break;
+            case 'JP_ADDR':
+                this.registers.PC = args[0];
+                break;
+            case 'CALL_ADDR':
+                this.registers.stackPush(this.registers.PC);
+                this.registers.PC = args[0];
+                break;
+            case 'SE_VX_KK':
+                if(this.registers.V[args[0]] === args[1]) {
+                    this.registers.PC += 2;
+                }
+                break;
+            case 'SNE_VX_KK':
+                if(this.registers.V[args[0]] !== args[1]) {
+                    this.registers.PC += 2;
+                }
+                break;
+            case 'SE_VX_VY':
+                if(this.registers.V[args[0]] === this.registers.V[args[1]]) {
+                    this.registers.PC += 2;
+                }
+                break;
             default:
                 console.error(`Instruction with id ${id} not found.`, instruction, args);
         }

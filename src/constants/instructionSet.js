@@ -57,7 +57,7 @@ export const INSTRUCTION_SET = [
     },
     {
         key: 8,
-        id: 'SNE_VX_VY',
+        id: 'SE_VX_VY',
         name: 'SE',
         mask: MASK_HIGHEST_AND_LOWEST_BYTE,
         pattern: 0x5000,
