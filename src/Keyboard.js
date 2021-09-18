@@ -26,7 +26,6 @@ export class Keyboard {
     }
 
     hasKeydown() {
-        // "Is any key down?"
-        return this.keys.findIndex((key) => key) != -1;
+        return this.keys.findIndex((key) => key);
     }
 }

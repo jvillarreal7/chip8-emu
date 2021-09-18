@@ -5,12 +5,24 @@ async function runChip8() {
     const arrayBuffer = await rom.arrayBuffer();
     const romBuffer = new Uint8Array(arrayBuffer);
     const chip8 = new Chip8(romBuffer);
-    chip8.registers.PC = 0x006;
-    chip8.registers.V[5] = 0x01;
-    chip8.registers.V[8] = 0x02;
-    chip8.execute(0x5580);
-    console.log('pc', chip8.registers.PC);
-    
+    chip8.registers.PC = 0x010;
+    chip8.registers.V[0] = 7;
+    chip8.registers.V[1] = 1;
+    chip8.registers.V[2] = 2;
+    chip8.registers.I = 0x100;
+
+    chip8.execute(0xf355);
+
+    chip8.registers.V[0] = 0;
+    chip8.registers.V[1] = 0;
+    chip8.registers.V[2] = 0;
+
+    chip8.execute(0xf365);
+
+    console.log('v0', chip8.registers.V[0].toString(16));
+    console.log('v1', chip8.registers.V[1].toString(16));
+    console.log('v2', chip8.registers.V[2].toString(16));
+    console.log('i', chip8.registers.I.toString(16));
 
 
     // chip8.registers.ST = 10;

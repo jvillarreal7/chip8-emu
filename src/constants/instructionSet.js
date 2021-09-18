@@ -171,13 +171,13 @@ export const INSTRUCTION_SET = [
         key: 22,
         id: 'JP_V0_ADDR',
         name: 'JP',
-        mask: MASK_HIGHEST_AND_LOWEST_BYTE,
+        mask: MASK_HIGHEST_BYTE,
         pattern: 0xB000,
         arguments: [MASK_NNN]
     },
     {
         key: 23,
-        id: 'RND_VX',
+        id: 'RND_VX_KK',
         name: 'RND',
         mask: MASK_HIGHEST_BYTE,
         pattern: 0xC000,

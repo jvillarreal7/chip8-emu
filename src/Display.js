@@ -26,7 +26,6 @@ export class Display {
     }
     drawBuffer() {
         for(let h = 0; h < DISPLAY_HEIGHT; h++) {
-            this.frameBuffer.push([]);
             for(let w = 0; w < DISPLAY_WIDTH; w++) {
                 this.drawPixel(h, w, this.frameBuffer[h][w]);
             }
@@ -48,14 +47,26 @@ export class Display {
         );
     }
     drawSprite(h, w, spriteAddress, num) {
+        let pixelCollision = 0;
         for(let lh = 0; lh < num; lh++) {
             const line = this.memory.memory[spriteAddress+lh];
             for(let lw = 0; lw < CHAR_SET_WIDTH; lw++) {
                 // Dislocate to the right.
                 const bitToCheck = (0b10000000 >> lw);
                 const value = line & bitToCheck;
-                this.drawPixel(h+lh, w+lw, value);
+                // Wrap around screen.
+                const ph = (h + lh) % DISPLAY_HEIGHT;
+                const pw = (w + lw) % DISPLAY_WIDTH;
+                if(value === 0) {
+                    continue;
+                }
+                if(this.frameBuffer[ph][pw] === 1) {
+                    pixelCollision = 1;
+                }
+                this.frameBuffer[ph][pw] ^= 1;
             }
         }
+        this.drawBuffer();
+        return pixelCollision;
     }
 }
